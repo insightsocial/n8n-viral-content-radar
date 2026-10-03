@@ -1,0 +1,836 @@
+{
+  "name": "Viral Content Radar (InsightSocial)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "337d799c-e9c2-5102-99e4-b95187c8d959",
+      "name": "Every weekday 8am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ab8ed10b-be9e-509e-bc17-be4a3a2cfef7",
+      "name": "Run now",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7f4b25e6-c472-58f7-8dbc-333ad5c25040",
+              "name": "business",
+              "value": "A meal-prep delivery service for busy families",
+              "type": "string"
+            },
+            {
+              "id": "e931f3e8-92e2-5163-abb6-0a7b436fcf5b",
+              "name": "niche",
+              "value": "meal prep",
+              "type": "string"
+            },
+            {
+              "id": "f6c4a6ca-319b-5f53-877d-76338e98ba9b",
+              "name": "hashtag",
+              "value": "mealprep",
+              "type": "string"
+            },
+            {
+              "id": "9c398986-0518-5dad-9a40-e6c494d93a4d",
+              "name": "markets",
+              "value": "US,GB,CA,AU",
+              "type": "string"
+            },
+            {
+              "id": "0bad3169-d50c-52cd-bcf6-deabd2069636",
+              "name": "language",
+              "value": "en",
+              "type": "string"
+            },
+            {
+              "id": "ea42b2d3-7651-545c-a2f2-0347cd645f2b",
+              "name": "top_tiktok",
+              "value": 5,
+              "type": "number"
+            },
+            {
+              "id": "cd8b61fe-1fea-5cc0-9fdf-e025b85f3e20",
+              "name": "top_reels",
+              "value": 3,
+              "type": "number"
+            },
+            {
+              "id": "ab97fd80-8b8c-53ca-b063-d82363042d21",
+              "name": "transcripts",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "id": "ffbdf018-3c5d-55ae-aa90-43765fe68a75",
+              "name": "email_to",
+              "value": "you@example.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4598a1e0-bf21-5857-8d93-642c870cbc68",
+      "name": "Your niche",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.insightsocial.app/v1/tiktok/search/top",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.niche }}"
+            },
+            {
+              "name": "publish_time",
+              "value": "this-week"
+            },
+            {
+              "name": "country",
+              "value": "={{ $json.markets }}"
+            },
+            {
+              "name": "sort_rows",
+              "value": "views"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-insightsocial-client",
+              "value": "n8n-viral-content-radar/1.0.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "1deedb13-32e1-5177-80ac-b64d00e01751",
+      "name": "TikTok: top this week",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "InsightSocial API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "url": "https://api.insightsocial.app/v1/instagram/search/hashtag",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "hashtag",
+              "value": "={{ $('Your niche').item.json.hashtag }}"
+            },
+            {
+              "name": "type",
+              "value": "clips"
+            },
+            {
+              "name": "max_age_days",
+              "value": "7"
+            },
+            {
+              "name": "sort_rows",
+              "value": "views"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-insightsocial-client",
+              "value": "n8n-viral-content-radar/1.0.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "bfb79987-4c35-5d55-ad98-c8a42907d3cc",
+      "name": "Instagram: top Reels",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "InsightSocial API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "jsCode": "// Turns the two searches into one short list of picks.\n// Nothing here costs credits: it only reads what the two calls above returned.\nconst cfg = $('Your niche').first().json;\nconst tk = $('TikTok: top this week').first().json;\nconst ig = $('Instagram: top Reels').first().json;\nconst tkRows = (tk.data && tk.data.items) || [];\nconst igRows = (ig.data && ig.data.items) || [];\n\n// \"Comment PREP for the recipe\" reels collect comments on purpose (an auto-DM\n// sends the link), so their comment count measures the funnel, not the content.\nconst QUOTED = /\\b(?:comment|dm|type)\\b\\s+(?:the word\\s+)?[\"“”'‘’]\\s*\\w{2,20}\\s*[\"“”'‘’]/i;\nconst CAPS = /\\b(?:[Cc]omment|COMMENT|DM|[Tt]ype)\\s+(?:the word\\s+)?[A-Z]{2,15}\\b/;\nconst AD = /#(?:ad|sponsored|partner)\\b|paid partnership/i;\n\n// Cuts by character, not UTF-16 unit, so an emoji is never split in half.\nconst cut = (s, n) => Array.from(s).slice(0, n).join('');\n\nfunction pick(row, platform) {\n  const p = row.post || {};\n  const e = p.engagement || {};\n  const text = (p.content && p.content.text) || '';\n  const views = e.views == null ? null : Number(e.views);\n  return {\n    platform,\n    author: (p.author && p.author.username) || '',\n    url: p.url || '',\n    caption: cut(text.replace(/\\s+/g, ' ').trim(), 280),\n    views,\n    likes: e.likes == null ? null : Number(e.likes),\n    comments: e.comments == null ? null : Number(e.comments),\n    shares: e.shares == null ? null : Number(e.shares),\n    saves: e.saves == null ? null : Number(e.saves),\n    save_rate: views && e.saves != null ? Math.round((e.saves / views) * 10000) / 100 : null,\n    published_at: p.published_at || null,\n    country: (p.ext && p.ext.region) || null,\n    comment_funnel: QUOTED.test(text) || CAPS.test(text),\n    ad: AD.test(text),\n  };\n}\n\n// Instagram hashtags have no country filter, so keep rows in your language instead.\n// A row whose language could not be told is kept.\nconst lang = String(cfg.language || '').trim().toLowerCase();\nconst inLanguage = r => !lang || !(r.computed && r.computed.language) || r.computed.language === lang;\n\nconst byViews = (a, b) => (b.views || 0) - (a.views || 0);\nconst tiktok = tkRows.filter(inLanguage).map(r => pick(r, 'TikTok')).sort(byViews).slice(0, Number(cfg.top_tiktok) || 5);\nconst reels = igRows.filter(inLanguage).map(r => pick(r, 'Instagram')).sort(byViews).slice(0, Number(cfg.top_reels) || 5);\nconst picks = [...tiktok, ...reels].map((v, i) => ({ rank: i + 1, ...v }));\n\nconst fmt = n => (n == null ? 'hidden' : Number(n).toLocaleString('en-US'));\nconst lines = picks.map(v => {\n  const flags = [v.comment_funnel ? 'COMMENT-FOR-LINK FUNNEL' : '', v.ad ? 'PAID AD' : ''].filter(Boolean).join(', ');\n  return `${v.rank}. [${v.platform}] @${v.author} - ${fmt(v.views)} views, ${fmt(v.likes)} likes, ${fmt(v.comments)} comments` +\n    (v.saves != null ? `, ${fmt(v.saves)} saves` : '') + (flags ? `  (${flags})` : '') +\n    `\\n   Posted: ${v.published_at || 'unknown'}${v.country ? ' from ' + v.country : ''}` +\n    `\\n   Caption: ${v.caption}\\n   URL: ${v.url}`;\n});\n\nreturn [{ json: {\n  business: cfg.business,\n  niche: cfg.niche,\n  hashtag: cfg.hashtag,\n  generated_at: $now.toISO(),\n  transcripts: Math.max(0, Math.min(3, Number(cfg.transcripts) || 0)),\n  credits_used: (tk.credits_used || 0) + (ig.credits_used || 0),\n  found: { tiktok: tkRows.length, instagram: igRows.length },\n  other_language: { tiktok: tkRows.length - tkRows.filter(inLanguage).length, instagram: igRows.length - igRows.filter(inLanguage).length },\n  picks,\n  videos_text: lines.join('\\n\\n'),\n} }];"
+      },
+      "id": "add9f6ba-2f63-55d9-bbe2-92d6c44f45dc",
+      "name": "Rank and flag",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b104fb5b-6d0e-5f37-af1b-e6f5c3a6077a",
+              "leftValue": "={{ $json.transcripts }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "32aea550-bf06-52a2-9202-bd5400b27cfa",
+      "name": "Read transcripts?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// The most-viewed picks get their spoken words read. 200 credits each.\nconst base = $input.first().json;\nreturn [...base.picks]\n  .sort((a, b) => (b.views || 0) - (a.views || 0))\n  .slice(0, base.transcripts)\n  .map(v => ({ json: { url: v.url, platform: v.platform, author: v.author, rank: v.rank } }));"
+      },
+      "id": "8e0363b4-a588-569b-b8e9-d3fa851e4a6e",
+      "name": "Pick videos to transcribe",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://api.insightsocial.app/v1/' + ($json.platform === 'TikTok' ? 'tiktok/post/transcript' : 'instagram/media/transcript') }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.url }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-insightsocial-client",
+              "value": "n8n-viral-content-radar/1.0.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "a3b15894-c1f4-5969-99b5-7ac9906c4af1",
+      "name": "Transcript",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        100
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "InsightSocial API"
+        }
+      },
+      "retryOnFail": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Joins the transcripts (if any) onto the picks and writes the prompt.\nconst base = $('Rank and flag').first().json;\nlet asked = [];\ntry { asked = $('Pick videos to transcribe').all().map(i => i.json); } catch (e) { asked = []; }\n\nfunction clean(vtt) {\n  return String(vtt || '')\n    .replace(/^WEBVTT.*$/m, '')\n    .split('\\n')\n    .filter(l => l.trim() && !/-->/.test(l) && !/^\\d+$/.test(l.trim()))\n    .join(' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nconst transcripts = [];\nlet credits = base.credits_used;\n$input.all().forEach((item, i) => {\n  const d = item.json && item.json.data;\n  if (!d || !asked[i]) return;\n  credits += item.json.credits_used || 0;\n  const text = d.transcript ? clean(d.transcript)\n    : (d.transcripts || []).map(t => t.text || '').join(' ').trim();\n  if (text) transcripts.push({ rank: asked[i].rank, author: asked[i].author, text: Array.from(text).slice(0, 2500).join('') });\n});\n\nconst t = transcripts.map(x => `#${x.rank} @${x.author} said:\\n\"${x.text}\"`).join('\\n\\n');\nconst prompt = `My business: ${base.business}\\nNiche: ${base.niche}\\n\\nThis week's most-viewed short videos in this niche:\\n\\n${base.videos_text}` +\n  (t ? `\\n\\nWhat the top videos actually say (transcripts):\\n\\n${t}` : '');\n\nreturn [{ json: { ...base, transcripts_read: transcripts.length, credits_used: credits, prompt } }];"
+      },
+      "id": "7444301b-155e-5036-9c7b-ace5ae4aac2a",
+      "name": "Attach transcripts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a short-form video strategist writing a morning brief for a small business. For each video: one or two sentences on why it spread (the hook in the first seconds, the format, the emotion or the trend), then the specific angle the reader's own business could take, then a 3-step shoot plan. Use the transcripts when you have them: quote the hook line. A transcript that reads as noise or another language means the video has little speech: ignore it and say nothing about it. A video flagged COMMENT-FOR-LINK FUNNEL collects comments on purpose, so do not read its comment count as interest. A video flagged PAID AD was paid for: say so, and judge the creative, not the reach. Never invent numbers; use only the ones given. Output clean Markdown: a heading per video, then finish with one 'Pattern of the day' that ties them together, and a ready-to-shoot 30-second script for the best idea."
+            }
+          ]
+        }
+      },
+      "id": "fcfdd59b-bcef-5308-a62a-e1af0343bb48",
+      "name": "Write the brief",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        2160,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "id": "e34803c3-4507-5d18-97b6-e58869e34eca",
+      "name": "Gemini model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.text }}",
+        "destinationKey": "html",
+        "options": {}
+      },
+      "id": "f3890927-bb32-5e36-bb70-5ffe7a79319b",
+      "name": "Markdown to HTML",
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        2460,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $('Your niche').first().json.email_to }}",
+        "subject": "=Viral {{ $('Your niche').first().json.niche }} brief, {{ $now.toFormat('LLL d') }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "ce21b7e8-efe5-5b30-94ac-b0a1a7a21366",
+      "name": "Email the brief",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2700,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "picks",
+        "include": "noOtherFields",
+        "options": {}
+      },
+      "id": "9ed7f910-5f3d-56ea-8a70-ee0bc551c042",
+      "name": "One row per pick",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $now.toISODate() }}",
+            "rank": "={{ $json.rank }}",
+            "platform": "={{ $json.platform }}",
+            "author": "={{ $json.author }}",
+            "views": "={{ $json.views }}",
+            "likes": "={{ $json.likes }}",
+            "comments": "={{ $json.comments }}",
+            "saves": "={{ $json.saves }}",
+            "comment_funnel": "={{ $json.comment_funnel }}",
+            "ad": "={{ $json.ad }}",
+            "url": "={{ $json.url }}",
+            "caption": "={{ $json.caption }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rank",
+              "displayName": "rank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "platform",
+              "displayName": "platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "author",
+              "displayName": "author",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "views",
+              "displayName": "views",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "likes",
+              "displayName": "likes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "saves",
+              "displayName": "saves",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "comment_funnel",
+              "displayName": "comment_funnel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ad",
+              "displayName": "ad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "caption",
+              "displayName": "caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1a35a552-eddc-576d-a5cd-1a4128e4fe89",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1440,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 1. Your niche\n**Edit `Your niche` once.**\n\n- `business`: one line on what you sell\n- `niche`: the phrase people search on TikTok\n- `hashtag`: the Instagram tag, no #\n- `markets`: keep TikTok picks from these countries\n- `language`: keep picks in this language\n- `transcripts`: how many top videos to read (0-3, 200 credits each)\n\nRuns every weekday at 8am. Use **Run now** to try it.",
+        "height": 800,
+        "width": 520,
+        "color": 7
+      },
+      "id": "e7517952-5bba-5d5d-a372-236bff49c923",
+      "name": "Note: setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 2. This week's top videos\n**One InsightSocial key.**\nTikTok's Top tab for your phrase, kept to your markets, and the Instagram Reels on your hashtag from the last 7 days, both sorted by views.\n\n20 + 100 credits. Failed calls and empty results cost nothing.",
+        "height": 800,
+        "width": 480,
+        "color": 5
+      },
+      "id": "ab261cf2-c6d9-5f8f-bef1-423ce695c2f8",
+      "name": "Note: data",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3. Rank and flag\nTop 5 TikToks and top 3 Reels by views.\n\nFlags **comment-for-link funnels** (their comment counts are manufactured) and **paid ads** so the brief does not copy the wrong thing.",
+        "height": 800,
+        "width": 460,
+        "color": 3
+      },
+      "id": "a20e4087-b63d-518c-8fce-381cc21e3c95",
+      "name": "Note: rank",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        940,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 4. Read what they said\nThe most-viewed picks get their spoken transcript, so the brief can quote the real hook. 200 credits each. Set `transcripts` to 0 to skip.",
+        "height": 800,
+        "width": 680,
+        "color": 6
+      },
+      "id": "a6b91d39-df14-5abc-9742-beff33560c9f",
+      "name": "Note: transcripts",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 5. Brief + deliver\nThe model explains why each one spread, the angle for your business and a 30-second script. Emailed to you; every pick is also logged to a Google Sheet so a swipe file builds itself.",
+        "height": 800,
+        "width": 760,
+        "color": 4
+      },
+      "id": "f8435a3d-3ddb-5e34-b2d5-6efa815f1e7d",
+      "name": "Note: brief",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2120,
+        -180
+      ]
+    }
+  ],
+  "connections": {
+    "Every weekday 8am": {
+      "main": [
+        [
+          {
+            "node": "Your niche",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run now": {
+      "main": [
+        [
+          {
+            "node": "Your niche",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Your niche": {
+      "main": [
+        [
+          {
+            "node": "TikTok: top this week",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TikTok: top this week": {
+      "main": [
+        [
+          {
+            "node": "Instagram: top Reels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instagram: top Reels": {
+      "main": [
+        [
+          {
+            "node": "Rank and flag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rank and flag": {
+      "main": [
+        [
+          {
+            "node": "Read transcripts?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "One row per pick",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read transcripts?": {
+      "main": [
+        [
+          {
+            "node": "Pick videos to transcribe",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Attach transcripts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick videos to transcribe": {
+      "main": [
+        [
+          {
+            "node": "Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcript": {
+      "main": [
+        [
+          {
+            "node": "Attach transcripts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach transcripts": {
+      "main": [
+        [
+          {
+            "node": "Write the brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write the brief": {
+      "main": [
+        [
+          {
+            "node": "Markdown to HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown to HTML": {
+      "main": [
+        [
+          {
+            "node": "Email the brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One row per pick": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Write the brief",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
