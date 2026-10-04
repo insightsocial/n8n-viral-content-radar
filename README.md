@@ -58,13 +58,15 @@ Instagram Reels across five searches, 19 were comment-for-link funnels. That inc
 30 Reels on #mealprep. One had 5,788 comments and 4,410 likes. The radar flags these funnels
 and tells the model not to read their comment counts as demand.
 
-**3. Instagram keyword search has no view counts.** All 40 keyword-search Reels from four niches
-came back without views. The hashtag Reels tab had views on all 30 Reels we pulled, so the radar
-searches the hashtag. Hashtags have no country filter, so the radar can filter by language
-instead: it drops a pick whose `post.language` is not your `language`. In the budget-travel run, 3
-of the 8 Reels on #budgettravel were not in English. Today neither search reports a language
-(`post.language` is `null` on every row we pulled in October 2026), and a pick with no language is
-kept, so expect the occasional Reel in another language until it does.
+**3. Instagram ranks by views, on the hashtag.** The radar searches the hashtag Reels tab, which
+had views on all 30 Reels we pulled. Keyword search (`/v1/instagram/search/reels`) had no views
+when we built the radar, but it has them now: all 30 Reels for `meal prep` came back with views,
+likes and comments in October 2026 (shares and saves are `null` on both searches). Hashtags have
+no country filter, so the radar can filter by language instead: it drops a pick whose
+`post.language` is not your `language`. In the budget-travel run, 3 of the 8 Reels on
+#budgettravel were not in English. Today neither search reports a language (`post.language` is
+`null` on every row we pulled in October 2026), and a pick with no language is kept, so expect
+the occasional Reel in another language until it does.
 
 ## Cost
 
