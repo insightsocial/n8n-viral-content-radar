@@ -136,7 +136,11 @@
           "parameters": [
             {
               "name": "x-insightsocial-client",
-              "value": "n8n-viral-content-radar/1.0.0"
+              "value": "n8n-viral-content-radar/1.1.0"
+            },
+            {
+              "name": "InsightSocial-Version",
+              "value": "2"
             }
           ]
         },
@@ -193,7 +197,11 @@
           "parameters": [
             {
               "name": "x-insightsocial-client",
-              "value": "n8n-viral-content-radar/1.0.0"
+              "value": "n8n-viral-content-radar/1.1.0"
+            },
+            {
+              "name": "InsightSocial-Version",
+              "value": "2"
             }
           ]
         },
@@ -221,7 +229,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Turns the two searches into one short list of picks.\n// Nothing here costs credits: it only reads what the two calls above returned.\nconst cfg = $('Your niche').first().json;\nconst tk = $('TikTok: top this week').first().json;\nconst ig = $('Instagram: top Reels').first().json;\nconst tkRows = (tk.data && tk.data.items) || [];\nconst igRows = (ig.data && ig.data.items) || [];\n\n// \"Comment PREP for the recipe\" reels collect comments on purpose (an auto-DM\n// sends the link), so their comment count measures the funnel, not the content.\nconst QUOTED = /\\b(?:comment|dm|type)\\b\\s+(?:the word\\s+)?[\"“”'‘’]\\s*\\w{2,20}\\s*[\"“”'‘’]/i;\nconst CAPS = /\\b(?:[Cc]omment|COMMENT|DM|[Tt]ype)\\s+(?:the word\\s+)?[A-Z]{2,15}\\b/;\nconst AD = /#(?:ad|sponsored|partner)\\b|paid partnership/i;\n\n// Cuts by character, not UTF-16 unit, so an emoji is never split in half.\nconst cut = (s, n) => Array.from(s).slice(0, n).join('');\n\nfunction pick(row, platform) {\n  const p = row.post || {};\n  const e = p.engagement || {};\n  const text = (p.content && p.content.text) || '';\n  const views = e.views == null ? null : Number(e.views);\n  return {\n    platform,\n    author: (p.author && p.author.username) || '',\n    url: p.url || '',\n    caption: cut(text.replace(/\\s+/g, ' ').trim(), 280),\n    views,\n    likes: e.likes == null ? null : Number(e.likes),\n    comments: e.comments == null ? null : Number(e.comments),\n    shares: e.shares == null ? null : Number(e.shares),\n    saves: e.saves == null ? null : Number(e.saves),\n    save_rate: views && e.saves != null ? Math.round((e.saves / views) * 10000) / 100 : null,\n    published_at: p.published_at || null,\n    country: (p.ext && p.ext.region) || null,\n    comment_funnel: QUOTED.test(text) || CAPS.test(text),\n    ad: AD.test(text),\n  };\n}\n\n// Instagram hashtags have no country filter, so keep rows in your language instead.\n// A row whose language could not be told is kept.\nconst lang = String(cfg.language || '').trim().toLowerCase();\nconst inLanguage = r => !lang || !(r.computed && r.computed.language) || r.computed.language === lang;\n\nconst byViews = (a, b) => (b.views || 0) - (a.views || 0);\nconst tiktok = tkRows.filter(inLanguage).map(r => pick(r, 'TikTok')).sort(byViews).slice(0, Number(cfg.top_tiktok) || 5);\nconst reels = igRows.filter(inLanguage).map(r => pick(r, 'Instagram')).sort(byViews).slice(0, Number(cfg.top_reels) || 5);\nconst picks = [...tiktok, ...reels].map((v, i) => ({ rank: i + 1, ...v }));\n\nconst fmt = n => (n == null ? 'hidden' : Number(n).toLocaleString('en-US'));\nconst lines = picks.map(v => {\n  const flags = [v.comment_funnel ? 'COMMENT-FOR-LINK FUNNEL' : '', v.ad ? 'PAID AD' : ''].filter(Boolean).join(', ');\n  return `${v.rank}. [${v.platform}] @${v.author} - ${fmt(v.views)} views, ${fmt(v.likes)} likes, ${fmt(v.comments)} comments` +\n    (v.saves != null ? `, ${fmt(v.saves)} saves` : '') + (flags ? `  (${flags})` : '') +\n    `\\n   Posted: ${v.published_at || 'unknown'}${v.country ? ' from ' + v.country : ''}` +\n    `\\n   Caption: ${v.caption}\\n   URL: ${v.url}`;\n});\n\nreturn [{ json: {\n  business: cfg.business,\n  niche: cfg.niche,\n  hashtag: cfg.hashtag,\n  generated_at: $now.toISO(),\n  transcripts: Math.max(0, Math.min(3, Number(cfg.transcripts) || 0)),\n  credits_used: (tk.credits_used || 0) + (ig.credits_used || 0),\n  found: { tiktok: tkRows.length, instagram: igRows.length },\n  other_language: { tiktok: tkRows.length - tkRows.filter(inLanguage).length, instagram: igRows.length - igRows.filter(inLanguage).length },\n  picks,\n  videos_text: lines.join('\\n\\n'),\n} }];"
+        "jsCode": "// Turns the two searches into one short list of picks.\n// Nothing here costs credits: it only reads what the two calls above returned.\nconst cfg = $('Your niche').first().json;\nconst tk = $('TikTok: top this week').first().json;\nconst ig = $('Instagram: top Reels').first().json;\nconst tkRows = (tk.data && tk.data.items) || [];\nconst igRows = (ig.data && ig.data.items) || [];\n\n// \"Comment PREP for the recipe\" reels collect comments on purpose (an auto-DM\n// sends the link), so their comment count measures the funnel, not the content.\nconst QUOTED = /\\b(?:comment|dm|type)\\b\\s+(?:the word\\s+)?[\"“”'‘’]\\s*\\w{2,20}\\s*[\"“”'‘’]/i;\nconst CAPS = /\\b(?:[Cc]omment|COMMENT|DM|[Tt]ype)\\s+(?:the word\\s+)?[A-Z]{2,15}\\b/;\nconst AD = /#(?:ad|sponsored|partner)\\b|paid partnership/i;\n\n// Cuts by character, not UTF-16 unit, so an emoji is never split in half.\nconst cut = (s, n) => Array.from(s).slice(0, n).join('');\n\nfunction pick(row, platform) {\n  const p = row.post || {};\n  const e = p.engagement || {};\n  const text = (p.content && p.content.text) || '';\n  const views = e.views == null ? null : Number(e.views);\n  return {\n    platform,\n    author: (p.author && p.author.username) || '',\n    url: p.url || '',\n    caption: cut(text.replace(/\\s+/g, ' ').trim(), 280),\n    views,\n    likes: e.likes == null ? null : Number(e.likes),\n    comments: e.comments == null ? null : Number(e.comments),\n    shares: e.shares == null ? null : Number(e.shares),\n    saves: e.saves == null ? null : Number(e.saves),\n    save_rate: views && e.saves != null ? Math.round((e.saves / views) * 10000) / 100 : null,\n    published_at: p.published_at || null,\n    country: (p.ext && p.ext.region) || null,\n    comment_funnel: QUOTED.test(text) || CAPS.test(text),\n    ad: AD.test(text),\n  };\n}\n\n// Instagram hashtags have no country filter, so keep rows in your language instead.\n// post.language is a code like \"en\" or \"en-US\", or null when the source does not\n// say; a row with no language is kept.\nconst lang = String(cfg.language || '').trim().toLowerCase();\nconst inLanguage = r => {\n  const l = r && r.post && r.post.language;\n  return !lang || !l || String(l).toLowerCase().split(/[-_]/)[0] === lang;\n};\n\nconst byViews = (a, b) => (b.views || 0) - (a.views || 0);\nconst tiktok = tkRows.filter(inLanguage).map(r => pick(r, 'TikTok')).sort(byViews).slice(0, Number(cfg.top_tiktok) || 5);\nconst reels = igRows.filter(inLanguage).map(r => pick(r, 'Instagram')).sort(byViews).slice(0, Number(cfg.top_reels) || 5);\nconst picks = [...tiktok, ...reels].map((v, i) => ({ rank: i + 1, ...v }));\n\nconst fmt = n => (n == null ? 'hidden' : Number(n).toLocaleString('en-US'));\nconst lines = picks.map(v => {\n  const flags = [v.comment_funnel ? 'COMMENT-FOR-LINK FUNNEL' : '', v.ad ? 'PAID AD' : ''].filter(Boolean).join(', ');\n  return `${v.rank}. [${v.platform}] @${v.author} - ${fmt(v.views)} views, ${fmt(v.likes)} likes, ${fmt(v.comments)} comments` +\n    (v.saves != null ? `, ${fmt(v.saves)} saves` : '') + (flags ? `  (${flags})` : '') +\n    `\\n   Posted: ${v.published_at || 'unknown'}${v.country ? ' from ' + v.country : ''}` +\n    `\\n   Caption: ${v.caption}\\n   URL: ${v.url}`;\n});\n\nreturn [{ json: {\n  business: cfg.business,\n  niche: cfg.niche,\n  hashtag: cfg.hashtag,\n  generated_at: $now.toISO(),\n  transcripts: Math.max(0, Math.min(3, Number(cfg.transcripts) || 0)),\n  credits_used: (tk.credits_used || 0) + (ig.credits_used || 0),\n  found: { tiktok: tkRows.length, instagram: igRows.length },\n  other_language: { tiktok: tkRows.length - tkRows.filter(inLanguage).length, instagram: igRows.length - igRows.filter(inLanguage).length },\n  picks,\n  videos_text: lines.join('\\n\\n'),\n} }];"
       },
       "id": "add9f6ba-2f63-55d9-bbe2-92d6c44f45dc",
       "name": "Rank and flag",
@@ -298,7 +306,11 @@
           "parameters": [
             {
               "name": "x-insightsocial-client",
-              "value": "n8n-viral-content-radar/1.0.0"
+              "value": "n8n-viral-content-radar/1.1.0"
+            },
+            {
+              "name": "InsightSocial-Version",
+              "value": "2"
             }
           ]
         },
@@ -325,7 +337,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Joins the transcripts (if any) onto the picks and writes the prompt.\nconst base = $('Rank and flag').first().json;\nlet asked = [];\ntry { asked = $('Pick videos to transcribe').all().map(i => i.json); } catch (e) { asked = []; }\n\nfunction clean(vtt) {\n  return String(vtt || '')\n    .replace(/^WEBVTT.*$/m, '')\n    .split('\\n')\n    .filter(l => l.trim() && !/-->/.test(l) && !/^\\d+$/.test(l.trim()))\n    .join(' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nconst transcripts = [];\nlet credits = base.credits_used;\n$input.all().forEach((item, i) => {\n  const d = item.json && item.json.data;\n  if (!d || !asked[i]) return;\n  credits += item.json.credits_used || 0;\n  const text = d.transcript ? clean(d.transcript)\n    : (d.transcripts || []).map(t => t.text || '').join(' ').trim();\n  if (text) transcripts.push({ rank: asked[i].rank, author: asked[i].author, text: Array.from(text).slice(0, 2500).join('') });\n});\n\nconst t = transcripts.map(x => `#${x.rank} @${x.author} said:\\n\"${x.text}\"`).join('\\n\\n');\nconst prompt = `My business: ${base.business}\\nNiche: ${base.niche}\\n\\nThis week's most-viewed short videos in this niche:\\n\\n${base.videos_text}` +\n  (t ? `\\n\\nWhat the top videos actually say (transcripts):\\n\\n${t}` : '');\n\nreturn [{ json: { ...base, transcripts_read: transcripts.length, credits_used: credits, prompt } }];"
+        "jsCode": "// Joins the transcripts (if any) onto the picks and writes the prompt.\nconst base = $('Rank and flag').first().json;\nlet asked = [];\ntry { asked = $('Pick videos to transcribe').all().map(i => i.json); } catch (e) { asked = []; }\n\nfunction clean(vtt) {\n  return String(vtt || '')\n    .replace(/^WEBVTT.*$/m, '')\n    .split('\\n')\n    .filter(l => l.trim() && !/-->/.test(l) && !/^\\d+$/.test(l.trim()))\n    .join(' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nconst transcripts = [];\nlet credits = base.credits_used;\n$input.all().forEach((item, i) => {\n  const d = item.json && item.json.data;\n  if (!d || !asked[i]) return;\n  credits += item.json.credits_used || 0;\n  // data.transcript is { language, text, segments }; text can still be WebVTT, and\n  // can be null when only segments came back. Older bodies had a string or a list.\n  const tr = d.transcript;\n  const raw = tr && typeof tr === 'object'\n    ? (tr.text || (tr.segments || []).map(s => s.text || '').join(' '))\n    : tr || (d.transcripts || []).map(t => t.text || '').join(' ');\n  const text = clean(raw);\n  if (text) transcripts.push({ rank: asked[i].rank, author: asked[i].author, text: Array.from(text).slice(0, 2500).join('') });\n});\n\nconst t = transcripts.map(x => `#${x.rank} @${x.author} said:\\n\"${x.text}\"`).join('\\n\\n');\nconst prompt = `My business: ${base.business}\\nNiche: ${base.niche}\\n\\nThis week's most-viewed short videos in this niche:\\n\\n${base.videos_text}` +\n  (t ? `\\n\\nWhat the top videos actually say (transcripts):\\n\\n${t}` : '');\n\nreturn [{ json: { ...base, transcripts_read: transcripts.length, credits_used: credits, prompt } }];"
       },
       "id": "7444301b-155e-5036-9c7b-ace5ae4aac2a",
       "name": "Attach transcripts",
@@ -579,7 +591,7 @@
     },
     {
       "parameters": {
-        "content": "## 1. Your niche\n**Edit `Your niche` once.**\n\n- `business`: one line on what you sell\n- `niche`: the phrase people search on TikTok\n- `hashtag`: the Instagram tag, no #\n- `markets`: keep TikTok picks from these countries\n- `language`: keep picks in this language\n- `transcripts`: how many top videos to read (0-3, 200 credits each)\n\nRuns every weekday at 8am. Use **Run now** to try it.",
+        "content": "## 1. Your niche\n**Edit `Your niche` once.**\n\n- `business`: one line on what you sell\n- `niche`: the phrase people search on TikTok\n- `hashtag`: the Instagram tag, no #\n- `markets`: keep TikTok picks from these countries\n- `language`: keep picks in this language (when the API reports one)\n- `transcripts`: how many top videos to read (0-3, 200 credits each)\n\nRuns every weekday at 8am. Use **Run now** to try it.",
         "height": 800,
         "width": 520,
         "color": 7

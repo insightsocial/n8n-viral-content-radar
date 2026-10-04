@@ -33,8 +33,8 @@ That hook line came from the video's spoken transcript, not its caption.
 2. **This week's top videos.** It makes two calls with one InsightSocial key. One gets TikTok's
    Top tab for your phrase, kept to your markets and sorted by views. The other gets the Reels on
    your hashtag from the last 7 days, also sorted by views.
-3. **Rank and flag.** It keeps the top 5 TikToks and top 3 Reels, drops the ones not in your
-   language, and flags comment-for-link funnels and paid ads (more on both below).
+3. **Rank and flag.** It keeps the top 5 TikToks and top 3 Reels, drops the ones the API marks as
+   another language, and flags comment-for-link funnels and paid ads (more on both below).
 4. **Read what they said.** For the most-viewed picks it pulls the spoken transcript, so the brief
    can quote the real hook. The number of transcripts is set by `transcripts` (0 to 3).
 5. **Brief + deliver.** A model writes the brief. It gets emailed to you as HTML, and each pick
@@ -60,8 +60,11 @@ and tells the model not to read their comment counts as demand.
 
 **3. Instagram keyword search has no view counts.** All 40 keyword-search Reels from four niches
 came back without views. The hashtag Reels tab had views on all 30 Reels we pulled, so the radar
-searches the hashtag. Hashtags have no country filter, so the radar filters by language instead.
-In the budget-travel run, 3 of the 8 Reels on #budgettravel were not in English.
+searches the hashtag. Hashtags have no country filter, so the radar can filter by language
+instead: it drops a pick whose `post.language` is not your `language`. In the budget-travel run, 3
+of the 8 Reels on #budgettravel were not in English. Today neither search reports a language
+(`post.language` is `null` on every row we pulled in October 2026), and a pick with no language is
+kept, so expect the occasional Reel in another language until it does.
 
 ## Cost
 
@@ -109,7 +112,7 @@ words.
 | `niche` | meal prep | The phrase searched on TikTok |
 | `hashtag` | mealprep | The Instagram hashtag, without # |
 | `markets` | US,GB,CA,AU | Keeps TikToks from these countries |
-| `language` | en | Keeps picks in this language; blank keeps all |
+| `language` | en | Keeps picks in this language when the API reports one; blank keeps all |
 | `top_tiktok` / `top_reels` | 5 / 3 | How many picks per platform |
 | `transcripts` | 1 | How many top picks to transcribe, 0 to 3 |
 | `email_to` | you@example.com | Who gets the brief |
@@ -120,7 +123,7 @@ The HTTP nodes call plain REST endpoints that all return the same JSON envelope.
 source, change the path in a node, for example:
 
 - `/v1/youtube/shorts/trending`
-- `/v1/tiktok/search` (adds a free relevance filter)
+- `/v1/tiktok/search`
 - `/v1/instagram/search/reels`
 
 The full list is at
