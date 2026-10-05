@@ -276,7 +276,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// The most-viewed picks get their spoken words read. 200 credits each.\nconst base = $input.first().json;\nreturn [...base.picks]\n  .sort((a, b) => (b.views || 0) - (a.views || 0))\n  .slice(0, base.transcripts)\n  .map(v => ({ json: { url: v.url, platform: v.platform, author: v.author, rank: v.rank } }));"
+        "jsCode": "// The most-viewed picks get their spoken words read. 100 credits each.\nconst base = $input.first().json;\nreturn [...base.picks]\n  .sort((a, b) => (b.views || 0) - (a.views || 0))\n  .slice(0, base.transcripts)\n  .map(v => ({ json: { url: v.url, platform: v.platform, author: v.author, rank: v.rank } }));"
       },
       "id": "8e0363b4-a588-569b-b8e9-d3fa851e4a6e",
       "name": "Pick videos to transcribe",
@@ -591,7 +591,7 @@
     },
     {
       "parameters": {
-        "content": "## 1. Your niche\n**Edit `Your niche` once.**\n\n- `business`: one line on what you sell\n- `niche`: the phrase people search on TikTok\n- `hashtag`: the Instagram tag, no #\n- `markets`: keep TikTok picks from these countries\n- `language`: keep picks in this language (when the API reports one)\n- `transcripts`: how many top videos to read (0-3, 200 credits each)\n\nRuns every weekday at 8am. Use **Run now** to try it.",
+        "content": "## 1. Your niche\n**Edit `Your niche` once.**\n\n- `business`: one line on what you sell\n- `niche`: the phrase people search on TikTok\n- `hashtag`: the Instagram tag, no #\n- `markets`: keep TikTok picks from these countries\n- `language`: keep picks in this language (when the API reports one)\n- `transcripts`: how many top videos to read (0-3, 100 credits each)\n\nRuns every weekday at 8am. Use **Run now** to try it.",
         "height": 800,
         "width": 520,
         "color": 7
@@ -639,7 +639,7 @@
     },
     {
       "parameters": {
-        "content": "## 4. Read what they said\nThe most-viewed picks get their spoken transcript, so the brief can quote the real hook. 200 credits each. Set `transcripts` to 0 to skip.",
+        "content": "## 4. Read what they said\nThe most-viewed picks get their spoken transcript, so the brief can quote the real hook. 100 credits each. Set `transcripts` to 0 to skip.",
         "height": 800,
         "width": 680,
         "color": 6

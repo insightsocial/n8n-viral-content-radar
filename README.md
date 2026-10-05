@@ -5,8 +5,8 @@ niche from the past week. It reads what the top video actually says, then emails
 why each video spread, the angle for **your** business, and a 30-second script you can shoot
 today. Every pick is also logged to a Google Sheet, so you build up a swipe file over time.
 
-One run costs **320 credits** with one transcript, or **120** without. That is measured, not
-estimated: the full breakdown is under [Cost](#cost).
+One run costs **160 credits** with one transcript, or **60** without. That is measured, not
+estimated (at the prices before the 2026-10-05 cut, then halved): the full breakdown is under [Cost](#cost).
 
 ![The workflow in n8n](assets/canvas.png)
 
@@ -74,16 +74,16 @@ Credits are per call and per endpoint. Failed calls and empty results cost nothi
 
 | Call | Credits |
 |---|---|
-| TikTok Top tab for your phrase (`/v1/tiktok/search/top`) | 20 |
-| Instagram hashtag Reels (`/v1/instagram/search/hashtag`) | 100 |
-| Each transcript (`/v1/tiktok/post/transcript` or `/v1/instagram/media/transcript`) | 200 |
-| **One run, 1 transcript (the default)** | **320** |
-| One run, no transcripts | 120 |
+| TikTok Top tab for your phrase (`/v1/tiktok/search/top`) | 10 |
+| Instagram hashtag Reels (`/v1/instagram/search/hashtag`) | 50 |
+| Each transcript (`/v1/tiktok/post/transcript` or `/v1/instagram/media/transcript`) | 100 |
+| **One run, 1 transcript (the default)** | **160** |
+| One run, no transcripts | 60 |
 
-A weekday schedule is about 22 runs a month: about 7,040 credits with one transcript, or 2,640
-without. Pro includes 10,000 credits a month. The free plan's 500 covers four runs without
+A weekday schedule is about 22 runs a month: about 3,520 credits with one transcript, or 1,320
+without. Pro includes 10,000 credits a month. The free plan's 500 covers eight runs without
 transcripts. If someone made the same search within the last hour, the shared cache can answer
-it for less (we saw 5 credits instead of 20). Plans are at
+it for less (2 credits instead of 10). Plans are at
 [insightsocial.app/pricing](https://www.insightsocial.app/pricing).
 
 The model step runs on Gemini 2.5 Flash, and its cost depends on your Google account. In our
@@ -137,7 +137,7 @@ and needs no key. It shows every path, parameter and price. Docs:
 
 - A run takes about a minute. Most of that is the model.
 - Videos with little speech (music over B-roll) come back with transcripts that read as noise.
-  The model is told to ignore them, but the transcript still costs 200 credits. Lower
+  The model is told to ignore them, but the transcript still costs 100 credits. Lower
   `transcripts` if your niche is mostly visual.
 - Instagram reports no save or share counts here, so Reels rank by views alone. TikTok picks
   carry saves too.
